@@ -1,17 +1,17 @@
-import { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import api from '../api/axios';
+import { useState, useEffect, useContext } from "react";
+import { useParams } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import api from "../api/axios";
 
 const ProblemDetail = () => {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [solution, setSolution] = useState('');
+  const [error, setError] = useState("");
+  const [solution, setSolution] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -19,7 +19,7 @@ const ProblemDetail = () => {
         const { data } = await api.get(`/problems/${id}`);
         setProblem(data);
       } catch (err) {
-        setError('Failed to fetch problem details');
+        setError("Failed to fetch problem details");
       } finally {
         setLoading(false);
       }
@@ -31,17 +31,22 @@ const ProblemDetail = () => {
   const handleSolutionSubmit = async (e) => {
     e.preventDefault();
     if (!solution.trim()) return;
-    
+
     setSubmitting(true);
     try {
-      const { data } = await api.post(`/solutions/problems/${id}/solutions`, { description: solution });
-      setProblem(prev => ({
+      const { data } = await api.post(`/solutions/problems/${id}/solutions`, {
+        description: solution,
+      });
+      setProblem((prev) => ({
         ...prev,
-        solutions: [...(prev.solutions || []), data]
+        solutions: [...(prev.solutions || []), data],
       }));
-      setSolution('');
+      setSolution("");
     } catch (err) {
-      setError('Failed to submit solution: ' + (err.response?.data?.message || err.message));
+      setError(
+        "Failed to submit solution: " +
+          (err.response?.data?.message || err.message)
+      );
     } finally {
       setSubmitting(false);
     }
@@ -50,36 +55,38 @@ const ProblemDetail = () => {
   const handleUpvote = async (solutionId) => {
     try {
       await api.put(`/solutions/${solutionId}/upvote`);
-      setProblem(prev => ({
+      setProblem((prev) => ({
         ...prev,
-        solutions: prev.solutions.map(sol => 
-          sol._id === solutionId 
-            ? { ...sol, upvotes: sol.upvotes + 1 } 
-            : sol
-        )
+        solutions: prev.solutions.map((sol) =>
+          sol._id === solutionId ? { ...sol, upvotes: sol.upvotes + 1 } : sol
+        ),
       }));
     } catch (err) {
-      setError('Failed to upvote solution');
+      setError("Failed to upvote solution");
     }
   };
 
   const handleCommentSubmit = async (e, solutionId) => {
     e.preventDefault();
     if (!comment.trim()) return;
-    
+
     try {
-      const { data } = await api.post(`/solutions/${solutionId}/comments`, { text: comment });
-      setProblem(prev => ({
+      const { data } = await api.post(`/solutions/${solutionId}/comments`, {
+        text: comment,
+      });
+      setProblem((prev) => ({
         ...prev,
-        solutions: prev.solutions.map(sol => 
-          sol._id === solutionId 
-            ? { ...sol, comments: [...(sol.comments || []), data] } 
+        solutions: prev.solutions.map((sol) =>
+          sol._id === solutionId
+            ? { ...sol, comments: [...(sol.comments || []), data] }
             : sol
-        )
+        ),
       }));
-      setComment('');
+      setComment("");
     } catch (err) {
-      setError('Failed to add comment: ' + (err.response?.data?.message || err.message));
+      setError(
+        "Failed to add comment: " + (err.response?.data?.message || err.message)
+      );
     }
   };
 
@@ -88,7 +95,11 @@ const ProblemDetail = () => {
   }
 
   if (error) {
-    return <div className="max-w-4xl mx-auto mt-10 p-6 bg-red-100 text-red-700 rounded">{error}</div>;
+    return (
+      <div className="max-w-4xl mx-auto mt-10 p-6 bg-red-100 text-red-700 rounded">
+        {error}
+      </div>
+    );
   }
 
   if (!problem) {
@@ -107,52 +118,14 @@ const ProblemDetail = () => {
         <div className="alert alert-danger">{error}</div>
       ) : (
         <>
-          <div className="card shadow mb-4">
-            <div className="card-body">
-              <h1 className="card-title h3 mb-3">{problem.title}</h1>
-              <div className="d-flex justify-content-between mb-3">
-                <div>
-                  <p className="text-muted mb-1">
-                    <i className="bi bi-person me-1"></i> {problem.user?.name || 'Anonymous'}
-                  </p>
-                  <p className="text-muted mb-1">
-                    <i className="bi bi-geo-alt me-1"></i> {problem.location}
-                  </p>
-                  <p className="text-muted">
-                    <i className="bi bi-calendar me-1"></i> {new Date(problem.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <div>
-                  <span className="badge bg-primary">
-                    <i className="bi bi-chat me-1"></i> {problem.solutions?.length || 0} Solutions
-                  </span>
-                </div>
-              </div>
-              
-              {problem.image && (
-                <div className="mb-4 text-center">
-                  <img 
-                    src={problem.image} 
-                    alt={problem.title} 
-                    className="img-fluid rounded" 
-                    style={{maxHeight: "400px"}}
-                  />
-                </div>
-              )}
-              
-              <div className="mb-3">
-                <h5 className="card-subtitle mb-2">Description</h5>
-                <p className="card-text">{problem.description}</p>
-              </div>
-            </div>
-          </div>
-
           {/* Solution Form */}
           {user ? (
             <div className="card shadow mb-4">
               <div className="card-body">
                 <h2 className="card-title h5 mb-3">Add Your Solution</h2>
-                {error && <div className="alert alert-danger mb-3">{error}</div>}
+                {error && (
+                  <div className="alert alert-danger mb-3">{error}</div>
+                )}
                 <form onSubmit={handleSolutionSubmit}>
                   <div className="mb-3">
                     <textarea
@@ -169,21 +142,29 @@ const ProblemDetail = () => {
                     className="btn btn-primary"
                     disabled={submitting}
                   >
-                    {submitting ? 'Submitting...' : 'Submit Solution'}
+                    {submitting ? "Submitting..." : "Submit Solution"}
                   </button>
                 </form>
               </div>
             </div>
           ) : (
             <div className="alert alert-info mb-4">
-              <p className="mb-0">Please <a href="/login" className="fw-bold">log in</a> to add your solution.</p>
+              <p className="mb-0">
+                Please{" "}
+                <a href="/login" className="fw-bold">
+                  log in
+                </a>{" "}
+                to add your solution.
+              </p>
             </div>
           )}
 
           {/* Solutions List */}
           <div className="card shadow">
             <div className="card-header bg-white">
-              <h2 className="h5 mb-0">Solutions ({problem.solutions?.length || 0})</h2>
+              <h2 className="h5 mb-0">
+                Solutions ({problem.solutions?.length || 0})
+              </h2>
             </div>
             <div className="card-body">
               {problem.solutions && problem.solutions.length > 0 ? (
@@ -192,16 +173,20 @@ const ProblemDetail = () => {
                     <div key={sol._id} className="border-bottom pb-3 mb-3">
                       <div className="d-flex justify-content-between align-items-start mb-2">
                         <div>
-                          <p className="fw-bold mb-0">{sol.user?.name || 'Anonymous'}</p>
+                          <p className="fw-bold mb-0">
+                            {sol.user?.name || "Anonymous"}
+                          </p>
                           <p className="text-muted small">
                             {new Date(sol.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                         <div>
-                          <button 
+                          <button
                             onClick={() => handleUpvote(sol._id)}
                             className={`btn btn-sm ${
-                              sol.upvotedBy?.includes(user?._id) ? 'btn-success' : 'btn-outline-primary'
+                              sol.upvotedBy?.includes(user?._id)
+                                ? "btn-success"
+                                : "btn-outline-primary"
                             }`}
                             disabled={!user}
                           >
@@ -210,23 +195,32 @@ const ProblemDetail = () => {
                           </button>
                         </div>
                       </div>
-                      <div className="card-text mb-3 p-2 bg-light rounded">{sol.description || sol.content}</div>
-                      
+                      <div className="card-text mb-3 p-2 bg-light rounded">
+                        {sol.description || sol.content}
+                      </div>
+
                       {/* Comments Section */}
                       <div className="mt-3 ps-3 border-start border-primary">
                         <h5 className="h6 mb-2">
                           <i className="bi bi-chat-dots me-1"></i>
                           Comments ({sol.comments?.length || 0})
                         </h5>
-                        
+
                         {sol.comments && sol.comments.length > 0 ? (
                           <div className="mb-3">
                             {sol.comments.map((comment) => (
-                              <div key={comment._id} className="mb-2 small p-2 bg-light rounded">
+                              <div
+                                key={comment._id}
+                                className="mb-2 small p-2 bg-light rounded"
+                              >
                                 <div className="d-flex align-items-center mb-1">
-                                  <span className="fw-bold">{comment.user?.name || 'Anonymous'}</span>
+                                  <span className="fw-bold">
+                                    {comment.user?.name || "Anonymous"}
+                                  </span>
                                   <small className="text-muted ms-2">
-                                    {new Date(comment.createdAt).toLocaleDateString()}
+                                    {new Date(
+                                      comment.createdAt
+                                    ).toLocaleDateString()}
                                   </small>
                                 </div>
                                 <span>{comment.text || comment.content}</span>
@@ -234,11 +228,13 @@ const ProblemDetail = () => {
                             ))}
                           </div>
                         ) : (
-                          <p className="text-muted small mb-3">No comments yet</p>
+                          <p className="text-muted small mb-3">
+                            No comments yet
+                          </p>
                         )}
-                        
+
                         {user && (
-                          <form 
+                          <form
                             onSubmit={(e) => handleCommentSubmit(e, sol._id)}
                             className="d-flex mt-3"
                           >
@@ -266,7 +262,9 @@ const ProblemDetail = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-muted">No solutions yet. Be the first to contribute!</p>
+                <p className="text-muted">
+                  No solutions yet. Be the first to contribute!
+                </p>
               )}
             </div>
           </div>
