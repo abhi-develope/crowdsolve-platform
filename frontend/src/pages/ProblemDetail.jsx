@@ -11,20 +11,20 @@ const ProblemDetail = () => {
   const [error, setError] = useState("");
   const [solution, setSolution] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [comment, setComment] = useState("");
+  const [comments, setComments] = useState({});
+
+  const fetchProblem = async () => {
+    try {
+      const { data } = await api.get(`/problems/${id}`);
+      setProblem(data);
+    } catch (err) {
+      setError("Failed to fetch problem details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProblem = async () => {
-      try {
-        const { data } = await api.get(`/problems/${id}`);
-        setProblem(data);
-      } catch (err) {
-        setError("Failed to fetch problem details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProblem();
   }, [id]);
 
@@ -34,13 +34,11 @@ const ProblemDetail = () => {
 
     setSubmitting(true);
     try {
-      const { data } = await api.post(`/solutions/problems/${id}/solutions`, {
+      await api.post(`/solutions/problems/${id}/solutions`, {
         description: solution,
       });
-      setProblem((prev) => ({
-        ...prev,
-        solutions: [...(prev.solutions || []), data],
-      }));
+      // Refresh the problem data to get the updated solutions
+      await fetchProblem();
       setSolution("");
     } catch (err) {
       setError(
@@ -55,12 +53,8 @@ const ProblemDetail = () => {
   const handleUpvote = async (solutionId) => {
     try {
       await api.put(`/solutions/${solutionId}/upvote`);
-      setProblem((prev) => ({
-        ...prev,
-        solutions: prev.solutions.map((sol) =>
-          sol._id === solutionId ? { ...sol, upvotes: sol.upvotes + 1 } : sol
-        ),
-      }));
+      // Refresh the problem data to get the updated upvotes
+      await fetchProblem();
     } catch (err) {
       setError("Failed to upvote solution");
     }
@@ -68,21 +62,19 @@ const ProblemDetail = () => {
 
   const handleCommentSubmit = async (e, solutionId) => {
     e.preventDefault();
-    if (!comment.trim()) return;
+    const commentText = comments[solutionId] || "";
+    if (!commentText.trim()) return;
 
     try {
-      const { data } = await api.post(`/solutions/${solutionId}/comments`, {
-        text: comment,
+      await api.post(`/solutions/${solutionId}/comments`, {
+        text: commentText,
       });
-      setProblem((prev) => ({
-        ...prev,
-        solutions: prev.solutions.map((sol) =>
-          sol._id === solutionId
-            ? { ...sol, comments: [...(sol.comments || []), data] }
-            : sol
-        ),
-      }));
-      setComment("");
+      
+      // Refresh the problem data to get the updated comments
+      await fetchProblem();
+      
+      // Clear only this solution's comment
+      setComments(prev => ({...prev, [solutionId]: ""}));
     } catch (err) {
       setError(
         "Failed to add comment: " + (err.response?.data?.message || err.message)
@@ -241,8 +233,8 @@ const ProblemDetail = () => {
                             <div className="input-group">
                               <input
                                 type="text"
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
+                                value={comments[sol._id] || ""}
+                                onChange={(e) => setComments(prev => ({...prev, [sol._id]: e.target.value}))}
                                 className="form-control form-control-sm"
                                 placeholder="Add a comment..."
                                 required
