@@ -2,6 +2,18 @@
 
 CrowdSolve is a collaborative problem-solving platform where users can post problems, share solutions, and engage in discussions to find the best answers collectively.
 
+## 📱 Application Screenshots
+
+<p align="center">
+  <img src="./Screenshots/Screenshot (83).png" width="200"/>
+  <img src="./Screenshots/Screenshot (82).png" width="200"/>
+  <img src="./Screenshots/Screenshot (81).png" width="200"/>
+  <img src="./Screenshots/Screenshot (80).png" width="200"/>
+  <img src="./Screenshots/Screenshot (79).png" width="200"/>
+  <img src="./Screenshots/Screenshot (78).png" width="200"/>
+  
+</p>
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
@@ -34,6 +46,7 @@ CrowdSolve is designed to harness the power of collective intelligence by allowi
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React**: UI library for building the user interface
 - **React Router**: For navigation and routing
 - **Axios**: For API requests
@@ -42,6 +55,7 @@ CrowdSolve is designed to harness the power of collective intelligence by allowi
 - **Vite**: Build tool and development server
 
 ### Backend
+
 - **Node.js**: JavaScript runtime
 - **Express**: Web framework for Node.js
 - **MongoDB**: NoSQL database
@@ -90,12 +104,14 @@ crowdsolve-platform/
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/crowdsolve-platform.git
    cd crowdsolve-platform
    ```
 
 2. Install backend dependencies:
+
    ```bash
    cd backend
    npm install
@@ -128,12 +144,14 @@ CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ### Development Mode
 
 1. Start the backend server:
+
    ```bash
    cd backend
    npm run dev
    ```
 
 2. Start the frontend development server:
+
    ```bash
    cd frontend
    npm run dev
@@ -144,6 +162,7 @@ CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ### Production Mode
 
 1. Build the frontend:
+
    ```bash
    cd frontend
    npm run build
